@@ -1,19 +1,83 @@
 "use server";
 
+import {
+  IAMClient,
+  CreateUserCommand,
+  PutUserPolicyCommand,
+  CreateAccessKeyCommand,
+} from "@aws-sdk/client-iam";
+import "dotenv/config";
+import { addProxyToClient } from "aws-sdk-v3-proxy";
+import { S3Client, CreateBucketCommand } from "@aws-sdk/client-s3";
+
+const iamClient = addProxyToClient(new IAMClient({}));
+const s3Client = addProxyToClient(new S3Client({}));
+
+const prefix = `self-service-buckets`;
+
+// TODO: username from auth
+const UserName = `ssb-testuser`;
+
 export async function createIamUser(prevState: any) {
-  // 1: Create IAMs
+  // TODO: username from auth
 
-  // 2. Attach policy
-  // Policy name: `self-service-buckets-${username}
+  await iamClient.send(
+    new CreateUserCommand({
+      UserName,
+      Tags: [{ Key: "createdBy", Value: "self-service-buckets" }],
+    }),
+  );
 
-  return null;
+  const policyDocument = {
+    Version: "2012-10-17",
+    Statement: [
+      // Bucket-level permissions
+      {
+        Effect: "Allow",
+        Action: ["s3:ListBucket"],
+        Resource: `arn:aws:s3:::${prefix}-${UserName}-*`,
+      },
+
+      // Object-level permissions
+      {
+        Effect: "Allow",
+        Action: ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+        Resource: `arn:aws:s3:::${prefix}-${UserName}-*/*`,
+      },
+    ],
+  };
+
+  await iamClient.send(
+    new PutUserPolicyCommand({
+      UserName,
+      PolicyName: `${prefix}-${UserName}`,
+      PolicyDocument: JSON.stringify(policyDocument),
+    }),
+  );
+
+  return { error: null, data: { UserName } };
 }
 
 export async function createKeys(prevState: any) {
-  return null;
+  // TODO: get username from auth
+  const { AccessKey } = await iamClient.send(
+    new CreateAccessKeyCommand({
+      UserName,
+    }),
+  );
+
+  return { error: null, data: AccessKey };
 }
 
 export async function createBucket(prevState: any, name: string) {
-  // Bucket name: `self-service-buckets-${username}-${name}
-  return null;
+  // TODO: get username from auth
+
+  const Bucket = `self-service-buckets-${UserName}-${name}`;
+  await s3Client.send(
+    new CreateBucketCommand({
+      Bucket,
+    }),
+  );
+
+  return { error: null, data: { Bucket } };
 }
