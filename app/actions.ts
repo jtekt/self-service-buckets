@@ -18,6 +18,10 @@ const prefix = `self-service-buckets`;
 // TODO: username from auth
 const UserName = `ssb-testuser`;
 
+export async function dummyAction(prevState: any) {
+  return { banana: "test" };
+}
+
 export async function createIamUser(prevState: any) {
   // TODO: username from auth
 
