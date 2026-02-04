@@ -22,12 +22,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { createBucket } from "@/app/actions";
 import { useActionState, startTransition } from "react";
+import ReturnHome from "@/components/return-home";
 
 const formSchema = z.object({
   bucketName: z
     .string()
-    .min(3, "Please provide at least 10 characters.")
-    .max(20, "Please keep it under 200 characters."),
+    .min(3, "Please provide at least 3 characters.")
+    .max(20, "Please keep it under 20 characters.")
+    .regex(
+      /^(?!^xn--)(?!^.*--ol-s3$)(?!^([0-9]+\.){3}[0-9]+$)(?!.*\.{2})[a-z0-9][a-z0-9\-\.]{1,61}[a-z0-9]$/,
+      "Bucket name is invalid",
+    ),
 });
 
 export default function FormRhfTextarea() {
@@ -49,69 +54,65 @@ export default function FormRhfTextarea() {
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Create bucket</CardTitle>
-        {/* <CardDescription>
+    <div>
+      <ReturnHome />
+
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Create bucket</CardTitle>
+          {/* <CardDescription>
           Customize your experience by telling us more about yourself.
         </CardDescription> */}
-      </CardHeader>
-      <CardContent>
-        <form id="form-rhf-textarea" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              name="bucketName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-textarea-about">
-                    Bucket name
-                  </FieldLabel>
-                  {/* <Textarea
-                    {...field}
-                    id="form-rhf-textarea-about"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="I'm a software engineer..."
-                    className="min-h-[120px]"
-                  /> */}
+        </CardHeader>
+        <CardContent>
+          <form id="form-rhf-textarea" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <Controller
+                name="bucketName"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="form-rhf-textarea-about">
+                      Bucket name
+                    </FieldLabel>
 
-                  <div className="flex items-center">
-                    <div className="whitespace-nowrap">
-                      self-service-buckets
+                    <div className="flex items-center">
+                      <div className="whitespace-nowrap">
+                        self-service-buckets
+                      </div>
+                      <div>-</div>
+                      <div>{session?.user?.preferredUsername || "unknown"}</div>
+                      <div>-</div>
+                      <Input
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="my-bucket"
+                      />
                     </div>
-                    <div>-</div>
-                    {/* TODO: typescript */}
-                    <div>{session?.user?.preferredUsername || "unknown"}</div>
-                    <div>-</div>
-                    <Input
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="my-bucket"
-                    />
-                  </div>
 
-                  <FieldDescription>Lowercase only</FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-        </form>
+                    {/* <FieldDescription>Lowercase only</FieldDescription> */}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </form>
 
-        {state?.error && <div>An error occured</div>}
-      </CardContent>
-      <CardFooter>
-        <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
-            Reset
-          </Button>
-          <Button type="submit" form="form-rhf-textarea">
-            Save
-          </Button>
-        </Field>
-      </CardFooter>
-    </Card>
+          {state?.error && (
+            <div className="text-destructive">{state.error}</div>
+          )}
+          {state?.data && <div>Created {state.data.Bucket}</div>}
+        </CardContent>
+        <CardFooter>
+          <Field orientation="horizontal">
+            <Button type="submit" form="form-rhf-textarea" disabled={pending}>
+              Create
+            </Button>
+          </Field>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

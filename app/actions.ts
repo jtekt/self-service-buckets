@@ -27,6 +27,8 @@ export async function createIamUser(prevState: any) {
   const { preferredUsername } = session.user;
 
   try {
+    throw new Error(`This action is disabled for the time being`);
+
     await iamClient.send(
       new CreateUserCommand({
         UserName: preferredUsername,
@@ -64,14 +66,26 @@ export async function createIamUser(prevState: any) {
     return { error: null, data: { UserName: preferredUsername } };
   } catch (error: any) {
     console.error(error);
-    return { error: error.text, data: null };
+    return { error: error.message, data: null };
   }
+}
+
+export async function getUserKeys() {
+  // TODO: implement
 }
 
 export async function createKeys(prevState: any) {
   const session = await auth();
   if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;
+
+  return {
+    error: null,
+    data: {
+      AccessKeyId: "dummy access key ID for testing",
+      SecretAccessKey: "dummy secret key for testing",
+    },
+  };
 
   try {
     const { AccessKey } = await iamClient.send(
@@ -82,8 +96,12 @@ export async function createKeys(prevState: any) {
     return { error: null, data: AccessKey };
   } catch (error: any) {
     console.error(error);
-    return { error: error.text, data: null };
+    return { error: error.message, data: null };
   }
+}
+
+export async function getUserBuckets() {
+  // TODO: implement
 }
 
 export async function createBucket(prevState: any, bucketName: string) {
@@ -94,8 +112,6 @@ export async function createBucket(prevState: any, bucketName: string) {
 
   const Bucket = `${prefix}-${preferredUsername}-${bucketName}`;
 
-  console.log({ Bucket });
-
   try {
     await s3Client.send(
       new CreateBucketCommand({
@@ -105,6 +121,6 @@ export async function createBucket(prevState: any, bucketName: string) {
     return { error: null, data: { Bucket } };
   } catch (error: any) {
     console.error(error);
-    return { error: error.text, data: null };
+    return { error: error.message, data: null };
   }
 }

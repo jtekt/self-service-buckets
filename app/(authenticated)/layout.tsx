@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 export default function Layout({
   children,
@@ -19,7 +20,7 @@ export default function Layout({
           <div>You must be authenticated to see this resource</div>
           <div>
             <Button asChild>
-              <a href="/login">Login</a>
+              <Link href="/login">Login</Link>
             </Button>
           </div>
         </div>
