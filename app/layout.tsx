@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import LoginInfo from "@/components/login-info";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,8 +32,12 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <header>Self-Service Buckets</header>
-          <main>{children}</main>
+          <header className="py-1 px-2 border-b flex items-center">
+            <h1 className="text-2xl">Self-Service Buckets</h1>
+            <div className="grow"></div>
+            <LoginInfo />
+          </header>
+          <main className="my-6 max-w-xl mx-auto">{children}</main>
         </body>
       </html>
     </SessionProvider>

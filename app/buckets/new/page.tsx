@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
-
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,9 +19,8 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { dummyAction } from "@/app/actions";
+import { createBucket, dummyAction } from "@/app/actions";
 import { useActionState, startTransition } from "react";
 
 const formSchema = z.object({
@@ -32,7 +31,9 @@ const formSchema = z.object({
 });
 
 export default function FormRhfTextarea() {
-  const [state, action, pending] = useActionState(dummyAction, null);
+  const { data: session, status } = useSession();
+
+  const [state, action, pending] = useActionState(createBucket, null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,14 +42,14 @@ export default function FormRhfTextarea() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit({ bucketName }: z.infer<typeof formSchema>) {
     startTransition(() => {
-      action();
+      action(bucketName);
     });
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Create bucket</CardTitle>
         {/* <CardDescription>
@@ -73,13 +74,22 @@ export default function FormRhfTextarea() {
                     placeholder="I'm a software engineer..."
                     className="min-h-[120px]"
                   /> */}
-                  <Input
-                    {...field}
-                    id="form-rhf-input-username"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="shadcn"
-                    autoComplete="username"
-                  />
+
+                  <div className="flex items-center">
+                    <div className="whitespace-nowrap">
+                      self-service-buckets
+                    </div>
+                    <div>-</div>
+                    {/* TODO: typescript */}
+                    <div>{session?.user?.preferredUsername || "unknown"}</div>
+                    <div>-</div>
+                    <Input
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="my-bucket"
+                    />
+                  </div>
+
                   <FieldDescription>Lowercase only</FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -90,7 +100,7 @@ export default function FormRhfTextarea() {
           </FieldGroup>
         </form>
 
-        {state?.banana || "No data just yet"}
+        {state?.error && <div>An error occured</div>}
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal">

@@ -9,25 +9,27 @@ import {
 import "dotenv/config";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
 import { S3Client, CreateBucketCommand } from "@aws-sdk/client-s3";
+import { auth } from "@/auth";
 
 const iamClient = addProxyToClient(new IAMClient({}));
 const s3Client = addProxyToClient(new S3Client({}));
 
 const prefix = `self-service-buckets`;
 
-// TODO: username from auth
-const UserName = `ssb-testuser`;
-
-export async function dummyAction(prevState: any) {
-  return { banana: "test" };
+export async function dummyAction(prevState: any, name: string) {
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized", data: null };
+  return { data: { name, session }, error: null };
 }
 
 export async function createIamUser(prevState: any) {
-  // TODO: username from auth
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized", data: null };
+  const { preferredUsername } = session.user;
 
   await iamClient.send(
     new CreateUserCommand({
-      UserName,
+      UserName: preferredUsername,
       Tags: [{ Key: "createdBy", Value: "self-service-buckets" }],
     }),
   );
@@ -39,49 +41,62 @@ export async function createIamUser(prevState: any) {
       {
         Effect: "Allow",
         Action: ["s3:ListBucket"],
-        Resource: `arn:aws:s3:::${prefix}-${UserName}-*`,
+        Resource: `arn:aws:s3:::${prefix}-${preferredUsername}-*`,
       },
 
       // Object-level permissions
       {
         Effect: "Allow",
         Action: ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
-        Resource: `arn:aws:s3:::${prefix}-${UserName}-*/*`,
+        Resource: `arn:aws:s3:::${prefix}-${preferredUsername}-*/*`,
       },
     ],
   };
 
   await iamClient.send(
     new PutUserPolicyCommand({
-      UserName,
-      PolicyName: `${prefix}-${UserName}`,
+      UserName: preferredUsername,
+      PolicyName: `${prefix}-${preferredUsername}`,
       PolicyDocument: JSON.stringify(policyDocument),
     }),
   );
 
-  return { error: null, data: { UserName } };
+  return { error: null, data: { UserName: preferredUsername } };
 }
 
 export async function createKeys(prevState: any) {
-  // TODO: get username from auth
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized", data: null };
+  const { preferredUsername } = session.user;
+
   const { AccessKey } = await iamClient.send(
     new CreateAccessKeyCommand({
-      UserName,
+      UserName: preferredUsername,
     }),
   );
 
   return { error: null, data: AccessKey };
 }
 
-export async function createBucket(prevState: any, name: string) {
-  // TODO: get username from auth
+export async function createBucket(prevState: any, bucketName: string) {
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized", data: null };
 
-  const Bucket = `self-service-buckets-${UserName}-${name}`;
-  await s3Client.send(
-    new CreateBucketCommand({
-      Bucket,
-    }),
-  );
+  const { preferredUsername } = session.user;
 
-  return { error: null, data: { Bucket } };
+  const Bucket = `${prefix}-${preferredUsername}-${bucketName}`;
+
+  console.log({ Bucket });
+
+  try {
+    await s3Client.send(
+      new CreateBucketCommand({
+        Bucket,
+      }),
+    );
+    return { error: null, data: { Bucket } };
+  } catch (error: any) {
+    console.error(error);
+    return { error: error.text, data: null };
+  }
 }

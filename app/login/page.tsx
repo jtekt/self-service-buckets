@@ -1,5 +1,6 @@
 "use client";
 import SignIn from "@/components/sign-in";
+import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 
 export default function Page() {
@@ -11,7 +12,12 @@ export default function Page() {
       {status === "loading" ? (
         <div>Loading</div>
       ) : session ? (
-        <div>You are signed in</div>
+        <>
+          <div>You are signed in as {JSON.stringify(session.user)}</div>
+          <div>
+            <a href="/">Back to home screen</a>
+          </div>
+        </>
       ) : (
         <SignIn />
       )}
