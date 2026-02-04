@@ -20,7 +20,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { createBucket, dummyAction } from "@/app/actions";
+import { createBucket } from "@/app/actions";
 import { useActionState, startTransition } from "react";
 
 const formSchema = z.object({
