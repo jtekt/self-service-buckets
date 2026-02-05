@@ -20,6 +20,8 @@ build-job:
 
 deploy-job:
   stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
   script:
     - kubectl config use-context eks/gitlab-agent-for-kubernetes:eks
     - kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
