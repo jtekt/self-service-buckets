@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export default async function Page() {
   // TODO: typing, caching
-  const iamUser: any = await getIamUser();
+  const iamUser = await getIamUser();
 
   return (
     <>
