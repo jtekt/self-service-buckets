@@ -11,8 +11,14 @@ import { addProxyToClient } from "aws-sdk-v3-proxy";
 import { S3Client, CreateBucketCommand } from "@aws-sdk/client-s3";
 import { auth } from "@/auth";
 
-const iamClient = addProxyToClient(new IAMClient({}));
-const s3Client = addProxyToClient(new S3Client({}));
+const { HTTPS_PROXY } = process.env;
+
+const iamClient = HTTPS_PROXY
+  ? addProxyToClient(new IAMClient({}))
+  : new IAMClient({});
+const s3Client = HTTPS_PROXY
+  ? addProxyToClient(new S3Client({}))
+  : new S3Client({});
 
 // TODO: overwriteable from env
 const prefix = `self-service-buckets`;

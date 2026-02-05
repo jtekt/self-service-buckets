@@ -1,0 +1,14 @@
+variables:
+  K8S_NAMESPACE: self-service-suite
+
+# TODO: build-job
+
+deploy-job:
+  stage: deploy
+  script:
+    - kubectl config use-context eks/gitlab-agent-for-kubernetes:eks
+    - kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    - kubectl config set-context --current --namespace=$K8S_NAMESPACE
+    # TODO: use ESO instead of CICD env
+    - kubectl create secret generic self-service-buckets-env --from-env-file=$ENV --dry-run=client -o yaml | kubectl apply -f -
+    # - kubectl apply -f ./manifests
