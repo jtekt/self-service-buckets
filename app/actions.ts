@@ -5,6 +5,8 @@ import {
   CreateUserCommand,
   PutUserPolicyCommand,
   CreateAccessKeyCommand,
+  GetUserCommand,
+  ListAccessKeysCommand,
 } from "@aws-sdk/client-iam";
 import "dotenv/config";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
@@ -24,7 +26,20 @@ const s3Client = HTTPS_PROXY
 const prefix = `self-service-buckets`;
 
 export async function getIamUser() {
-  // TODO: implement
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized", data: null };
+  const { preferredUsername: UserName } = session.user;
+
+  try {
+    const command = new GetUserCommand({ UserName });
+    const { User } = await iamClient.send(command);
+    return User;
+  } catch (err) {
+    if (err instanceof Error && err.name !== "NoSuchEntityException") {
+      console.error("Error retrieving user:", err);
+    }
+    return undefined;
+  }
 }
 
 export async function createIamUser(prevState: any) {
@@ -77,7 +92,19 @@ export async function createIamUser(prevState: any) {
 }
 
 export async function getUserKeys() {
-  // TODO: implement
+  const session = await auth();
+  if (!session?.user) return { error: "Unauthorized", data: null };
+  const { preferredUsername: UserName } = session.user;
+
+  try {
+    const { AccessKeyMetadata } = await iamClient.send(
+      new ListAccessKeysCommand({ UserName }),
+    );
+
+    return AccessKeyMetadata;
+  } catch (err) {
+    console.error("Error listing access keys:", err);
+  }
 }
 
 export async function createKeys(prevState: any) {
