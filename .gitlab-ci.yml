@@ -1,7 +1,22 @@
 variables:
   K8S_NAMESPACE: self-service-suite
+  APPLICATION_NAME: self-service-buckets
+  CONTAINER_IMAGE_NAME: ${APPLICATION_NAME}
+  CONTAINER_IMAGE: ${AWS_ECR_URL}/${CONTAINER_IMAGE_NAME}
+  CONTAINER_IMAGE_TAGGED: ${CONTAINER_IMAGE}:${CI_COMMIT_SHORT_SHA}
 
-# TODO: build-job
+build-job:
+  stage: build
+  before_script:
+    - >
+      aws ecr create-repository --repository-name ${CONTAINER_IMAGE_NAME}
+      || echo "Repository might have already existed"
+
+  script:
+    - docker build -t ${CONTAINER_IMAGE_TAGGED} .
+    - docker push ${CONTAINER_IMAGE_TAGGED}
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 deploy-job:
   stage: deploy
