@@ -11,6 +11,7 @@ declare module "next-auth" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Keycloak],
+  trustHost: true,
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account && profile) {
