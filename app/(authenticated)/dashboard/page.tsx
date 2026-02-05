@@ -1,4 +1,4 @@
-import { getIamUser } from "@/app/actions";
+import { getIamUser } from "@/lib/actions/users";
 import { Button } from "@/components/ui/button";
 import {
   CylinderIcon,
@@ -19,22 +19,22 @@ export default async function Page() {
       <div className="flex flex-col gap-2">
         {iamUser ? (
           <>
-            <Button disabled>
+            <Button disabled color="green-500">
               <UserCheckIcon />
               <span>{iamUser.UserName}</span>
             </Button>
 
             <Button asChild>
-              <Link href="/keys/new">
+              <Link href="/keys">
                 <KeyIcon />
-                <span>Create key</span>
+                <span>Keys</span>
               </Link>
             </Button>
 
             <Button asChild>
-              <Link href="/buckets/new">
+              <Link href="/buckets">
                 <CylinderIcon />
-                <span>Create bucket</span>
+                <span>Buckets</span>
               </Link>
             </Button>
           </>

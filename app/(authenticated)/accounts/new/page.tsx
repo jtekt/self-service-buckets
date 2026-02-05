@@ -1,5 +1,5 @@
 "use client";
-import { createIamUser } from "@/app/actions";
+import { createIamUser } from "@/lib/actions/users";
 import ReturnHome from "@/components/return-home";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";

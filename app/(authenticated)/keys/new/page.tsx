@@ -1,5 +1,5 @@
 "use client";
-import { createKeys } from "@/app/actions";
+import { createKeys } from "@/lib/actions/users";
 import ReturnHome from "@/components/return-home";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";

@@ -20,7 +20,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { createBucket } from "@/app/actions";
+import { createBucket } from "@/lib/actions/buckets";
 import { useActionState, startTransition } from "react";
 import ReturnHome from "@/components/return-home";
 
