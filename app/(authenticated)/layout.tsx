@@ -13,6 +13,7 @@ export default function Layout({
 
   return (
     <>
+      {/* TODO: loader */}
       {session?.user ? (
         children
       ) : (

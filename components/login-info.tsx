@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { Button } from "./ui/button";
-import { LogInIcon, UserIcon } from "lucide-react";
+import { UserIcon } from "lucide-react";
 import { LogOutIcon } from "lucide-react";
 import Link from "next/link";
 
