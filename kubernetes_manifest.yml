@@ -25,6 +25,8 @@ spec:
               value: 要らない
             - name: AUTH_KEYCLOAK_ISSUER
               value: https://keycloak.jtektrnd.net/realms/jtekt
+            - name: NEXTAUTH_URL
+              value: https://self-service-buckets.jtektrnd.net
           envFrom:
             - secretRef:
                 name: self-service-buckets-env
