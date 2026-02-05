@@ -26,4 +26,4 @@ deploy-job:
     - kubectl config set-context --current --namespace=$K8S_NAMESPACE
     # TODO: use ESO instead of CICD env
     - kubectl create secret generic self-service-buckets-env --from-env-file=$ENV --dry-run=client -o yaml | kubectl apply -f -
-    # - kubectl apply -f ./manifests
+    - envsubst < kubernetes_manifest.yml | kubectl apply -f -
