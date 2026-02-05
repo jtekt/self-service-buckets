@@ -48,7 +48,7 @@ export async function createIamUser(prevState: any) {
   const { preferredUsername } = session.user;
 
   try {
-    throw new Error(`This action is disabled for the time being`);
+    // throw new Error(`This action is disabled for the time being`);
 
     await iamClient.send(
       new CreateUserCommand({
@@ -112,13 +112,13 @@ export async function createKeys(prevState: any) {
   if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;
 
-  return {
-    error: null,
-    data: {
-      AccessKeyId: "dummy access key ID for testing",
-      SecretAccessKey: "dummy secret key for testing",
-    },
-  };
+  // return {
+  //   error: null,
+  //   data: {
+  //     AccessKeyId: "dummy access key ID for testing",
+  //     SecretAccessKey: "dummy secret key for testing",
+  //   },
+  // };
 
   try {
     const { AccessKey } = await iamClient.send(
