@@ -1,3 +1,5 @@
+"use server";
+import "dotenv/config";
 import {
   CreateAccessKeyCommand,
   CreateUserCommand,
@@ -5,9 +7,18 @@ import {
   ListAccessKeysCommand,
   PutUserPolicyCommand,
 } from "@aws-sdk/client-iam";
-import { iamClient } from "@/lib/iam";
 import { auth } from "@/auth";
 import { basePrefix } from "@/lib/config";
+import { addProxyToClient } from "aws-sdk-v3-proxy";
+import { S3Client } from "@aws-sdk/client-s3";
+
+import { IAMClient } from "@aws-sdk/client-iam";
+
+const { HTTPS_PROXY } = process.env;
+
+const iamClient = HTTPS_PROXY
+  ? addProxyToClient(new IAMClient({}))
+  : new IAMClient({});
 
 export async function getIamUser() {
   const session = await auth();

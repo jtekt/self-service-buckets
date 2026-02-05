@@ -1,8 +1,18 @@
 "use server";
 import { auth } from "@/auth";
-import { s3Client } from "@/lib/s3";
 import { basePrefix } from "@/lib/config";
-import { CreateBucketCommand, ListBucketsCommand } from "@aws-sdk/client-s3";
+import {
+  CreateBucketCommand,
+  ListBucketsCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { addProxyToClient } from "aws-sdk-v3-proxy";
+
+const { HTTPS_PROXY } = process.env;
+
+const s3Client = HTTPS_PROXY
+  ? addProxyToClient(new S3Client({}))
+  : new S3Client({});
 
 export async function getUserBuckets() {
   const session = await auth();
