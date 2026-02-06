@@ -5,12 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
   FieldError,
@@ -21,17 +16,9 @@ import { Input } from "@/components/ui/input";
 import { createBucket } from "@/lib/actions/buckets";
 import { useActionState, startTransition } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  CheckCircleIcon,
-  DatabaseIcon,
-} from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { CheckCircleIcon, DatabaseIcon } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ReturnTo from "@/components/return-to";
-import Link from "next/link";
 import {
   InputGroup,
   InputGroupAddon,
@@ -71,52 +58,6 @@ export default function CreateBucketPage() {
     );
   }
 
-  /* ---------------- SUCCESS VIEW ---------------- */
-  if (state?.data) {
-    const { Bucket, Region} = state.data;
-
-    return (
-      <div className="space-y-4">
-        <ReturnTo to="/buckets" />
-
-        <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-50">
-          <CheckCircleIcon className="h-4 w-4" />
-          <AlertTitle>Bucket created</AlertTitle>
-          <AlertDescription>
-            Your bucket is ready to accept data.
-          </AlertDescription>
-        </Alert>
-
-        <FieldGroup className="space-y-4 rounded-md border p-4">
-          <Field>
-            <FieldLabel>Bucket name</FieldLabel>
-            <Input value={Bucket} readOnly />
-          </Field>
-
-          <Field>
-            <FieldLabel>Region</FieldLabel>
-            <Input value={Region} readOnly />
-          </Field>
-        </FieldGroup>
-
-        <div className="flex gap-2">
-          <Button asChild>
-            <Link href={`/buckets/${encodeURIComponent(Bucket)}`}>
-              View bucket
-            </Link>
-          </Button>
-
-          <Button variant="outline" asChild>
-            <Link href="/buckets">
-              Back to buckets
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  /* ---------------- FORM VIEW ---------------- */
   return (
     <div className="space-y-4">
       <ReturnTo to="/buckets" />
@@ -184,6 +125,30 @@ export default function CreateBucketPage() {
           </Button>
         </div>
       </Card>
+
+      {state?.data && (
+        <>
+          <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-50">
+            <CheckCircleIcon className="h-4 w-4" />
+            <AlertTitle>Bucket created</AlertTitle>
+            <AlertDescription>
+              Bucket <strong>{state.data.Bucket}</strong> is ready to accept data.
+            </AlertDescription>
+          </Alert>
+
+          <FieldGroup className="space-y-4 rounded-md border p-4">
+            <Field>
+              <FieldLabel>Bucket name</FieldLabel>
+              <Input value={state.data.Bucket} readOnly />
+            </Field>
+
+            <Field>
+              <FieldLabel>Region</FieldLabel>
+              <Input value={state.data.Region} readOnly />
+            </Field>
+          </FieldGroup>
+        </>
+      )}
     </div>
   );
 }
