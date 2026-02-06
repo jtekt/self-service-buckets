@@ -126,27 +126,38 @@ export default function CreateBucketPage() {
         </div>
       </Card>
 
-      {state?.data && (
+      {!pending && state?.error && (
+        <Alert variant="destructive">
+          <AlertTitle>Unable to create bucket</AlertTitle>
+          <AlertDescription>{state.error}</AlertDescription>
+        </Alert>
+      )}
+
+      {!pending && state?.data && (
         <>
           <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-50">
             <CheckCircleIcon className="h-4 w-4" />
             <AlertTitle>Bucket created</AlertTitle>
             <AlertDescription>
-              Bucket <strong>{state.data.Bucket}</strong> is ready to accept data.
+              Bucket <strong>{state.data.Bucket}</strong> is ready
             </AlertDescription>
           </Alert>
 
-          <FieldGroup className="space-y-4 rounded-md border p-4">
-            <Field>
-              <FieldLabel>Bucket name</FieldLabel>
-              <Input value={state.data.Bucket} readOnly />
-            </Field>
+          <Card>
+            <CardContent>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel>Bucket name</FieldLabel>
+                  <Input value={state.data.Bucket} readOnly />
+                </Field>
 
-            <Field>
-              <FieldLabel>Region</FieldLabel>
-              <Input value={state.data.Region} readOnly />
-            </Field>
-          </FieldGroup>
+                <Field>
+                  <FieldLabel>Region</FieldLabel>
+                  <Input value={state.data.Region} readOnly />
+                </Field>
+              </FieldGroup>
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

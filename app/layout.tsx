@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { LogoutButton } from "@/components/logout-button";
 import { ModeToggle } from "@/components/toggle-mode";
 import Link from "next/link";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -59,6 +60,7 @@ export default function RootLayout({
                 Self-service Buckets | JTEKT Corporation
               </footer>
             </div>
+            <Toaster richColors />
           </ThemeProvider>
         </body>
       </html>
