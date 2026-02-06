@@ -10,11 +10,10 @@ import {
 import { auth } from "@/auth";
 import { basePrefix } from "@/lib/config";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
-import { S3Client } from "@aws-sdk/client-s3";
 
 import { IAMClient } from "@aws-sdk/client-iam";
 
-const { HTTPS_PROXY } = process.env;
+const { HTTPS_PROXY, NODE_ENV } = process.env;
 
 const iamClient = HTTPS_PROXY
   ? addProxyToClient(new IAMClient({}))
@@ -103,6 +102,14 @@ export async function getUserKeys() {
 }
 
 export async function createKeys(prevState: any) {
+  if (NODE_ENV === "development")
+    return {
+      data: {
+        AccessKeyId: "Dummy AccessKeyId",
+        SecretAccessKey: "Dummy SecretAccessKey",
+      },
+    };
+
   const session = await auth();
   if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;
