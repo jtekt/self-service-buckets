@@ -20,7 +20,7 @@ export default async function Page() {
         <h2 className="text-2xl my-4">My keys</h2>
         <div>
           <Button asChild>
-            <Link href="/buckets/new">
+            <Link href="/keys/new">
               <PlusIcon />
               <span>Create</span>
             </Link>
