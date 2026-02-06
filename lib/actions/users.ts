@@ -1,4 +1,5 @@
 "use server";
+
 import "dotenv/config";
 import {
   CreateAccessKeyCommand,
@@ -10,7 +11,6 @@ import {
 import { auth } from "@/auth";
 import { basePrefix } from "@/lib/config";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
-import { S3Client } from "@aws-sdk/client-s3";
 
 import { IAMClient } from "@aws-sdk/client-iam";
 
@@ -22,7 +22,7 @@ const iamClient = HTTPS_PROXY
 
 export async function getIamUser() {
   const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
+  if (!session?.user) return;
   const { preferredUsername: UserName } = session.user;
 
   try {
@@ -33,11 +33,11 @@ export async function getIamUser() {
     if (err instanceof Error && err.name !== "NoSuchEntityException") {
       console.error("Error retrieving user:", err);
     }
-    return undefined;
+    return;
   }
 }
 
-export async function createIamUser(prevState: any) {
+export async function createIamUser() {
   const session = await auth();
   if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;
@@ -82,7 +82,7 @@ export async function createIamUser(prevState: any) {
     return { error: null, data: { UserName: preferredUsername } };
   } catch (error: any) {
     console.error(error);
-    return { error: error.message, data: null };
+    return { error: error.message as string, data: null };
   }
 }
 
@@ -102,7 +102,7 @@ export async function getUserKeys() {
   }
 }
 
-export async function createKeys(prevState: any) {
+export async function createKeys(_: any) {
   const session = await auth();
   if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;

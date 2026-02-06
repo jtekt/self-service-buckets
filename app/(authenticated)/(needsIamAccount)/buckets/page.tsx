@@ -1,4 +1,4 @@
-import ReturnHome from "@/components/return-home";
+import ReturnTo from "@/components/return-to";
 import { Button } from "@/components/ui/button";
 import {
   Item,
@@ -7,17 +7,16 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { getUserBuckets } from "@/lib/actions/buckets";
-import { Bucket } from "@aws-sdk/client-s3";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 
 export default async function Page() {
-  const res: any = await getUserBuckets();
-
+  const res = await getUserBuckets();
+  
   return (
-    <div>
-      <ReturnHome />
-      <div className="flex justify-between items-center my-4">
+    <div className="space-y-4">
+      <ReturnTo to="/" />
+      <div className="flex justify-between items-center">
         <h2 className="text-2xl">My buckets</h2>
         <div>
           <Button asChild>
@@ -28,8 +27,8 @@ export default async function Page() {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col">
-        {res.Buckets.map((b: Bucket) => (
+      <div className="flex flex-col gap-1">
+        {res.Buckets?.map((b) => (
           <Item variant="outline" key={b.BucketArn}>
             <ItemContent>
               <ItemTitle>{b.Name}</ItemTitle>

@@ -7,8 +7,8 @@ export default async function IamAuthLayout({
   children: React.ReactNode;
 }) {
   const iam = await getIamUser();
-  if (!iam) {
-    redirect("/accounts/new");
+  if (iam) {
+    redirect("/");
   }
 
   return children;
