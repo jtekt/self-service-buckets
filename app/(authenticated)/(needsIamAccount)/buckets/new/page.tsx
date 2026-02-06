@@ -42,8 +42,8 @@ import {
 const formSchema = z.object({
   bucketName: z
     .string()
-    .min(3)
-    .max(20)
+    .min(3, "Please provide at least 3 characters.")
+    .max(20, "Please keep it under 20 characters.")
     .regex(
       /^(?!^xn--)(?!^.*--ol-s3$)(?!^([0-9]+\.){3}[0-9]+$)(?!.*\.{2})[a-z0-9][a-z0-9\-\.]{1,61}[a-z0-9]$/,
       "Bucket name is invalid",
