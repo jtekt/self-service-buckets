@@ -1,9 +1,9 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function ReturnHome() {
+export default function ReturnTo({ to }: { to: string }) {
   return (
-    <Link href="/" className="inline-flex items-center gap-1">
+    <Link href={to} className="inline-flex items-center gap-1">
       <ArrowLeft />
       <span>Return</span>
     </Link>

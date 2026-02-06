@@ -25,7 +25,7 @@ export async function getUserBuckets() {
   return await s3Client.send(new ListBucketsCommand({ Prefix }));
 }
 
-export async function createBucket(prevState: any, bucketName: string) {
+export async function createBucket(_: any, bucketName: string) {
   const session = await auth();
   if (!session?.user) return { error: "Unauthorized", data: null };
 
@@ -39,7 +39,13 @@ export async function createBucket(prevState: any, bucketName: string) {
         Bucket,
       }),
     );
-    return { error: null, data: { Bucket } };
+
+    const region =
+      typeof s3Client.config.region === "string"
+        ? s3Client.config.region
+        : await s3Client.config.region();
+
+    return { error: null, data: { Bucket, Region: region } };
   } catch (error: any) {
     console.error(error);
     return { error: error.message, data: null };

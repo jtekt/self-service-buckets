@@ -1,20 +1,13 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -22,7 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { createBucket } from "@/lib/actions/buckets";
 import { useActionState, startTransition } from "react";
-import ReturnHome from "@/components/return-home";
+import { Spinner } from "@/components/ui/spinner";
+import { CheckCircleIcon, DatabaseIcon } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import ReturnTo from "@/components/return-to";
 import {
   InputGroup,
   InputGroupAddon,
@@ -41,37 +37,41 @@ const formSchema = z.object({
     ),
 });
 
-export default function FormRhfTextarea() {
+export default function CreateBucketPage() {
   const { data: session, status } = useSession();
-
   const [state, action, pending] = useActionState(createBucket, null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      bucketName: "",
-    },
+    defaultValues: { bucketName: "" },
   });
 
   function onSubmit({ bucketName }: z.infer<typeof formSchema>) {
-    startTransition(() => {
-      action(bucketName);
-    });
+    startTransition(() => action(bucketName));
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center">
+        <Spinner className="size-8" />
+      </div>
+    );
   }
 
   return (
-    <div>
-      <ReturnHome />
+    <div className="space-y-4">
+      <ReturnTo to="/buckets" />
 
-      <Card className="w-full">
+      <Card>
         <CardHeader>
-          <CardTitle>Create bucket</CardTitle>
-          {/* <CardDescription>
-          Customize your experience by telling us more about yourself.
-        </CardDescription> */}
+          <CardTitle className="flex items-center gap-2">
+            <DatabaseIcon className="h-5 w-5" />
+            Create bucket
+          </CardTitle>
         </CardHeader>
+
         <CardContent>
-          <form id="form-rhf-textarea" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="create-bucket" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="bucketName"
@@ -91,8 +91,9 @@ export default function FormRhfTextarea() {
                       <InputGroupInput
                         id="name"
                         {...field}
-                        aria-invalid={fieldState.invalid}
                         placeholder="my-bucket"
+                        disabled={pending}
+                        autoFocus
                       />
                     </InputGroup>
 
@@ -104,20 +105,50 @@ export default function FormRhfTextarea() {
               />
             </FieldGroup>
           </form>
-
-          {state?.error && (
-            <div className="text-destructive">{state.error}</div>
-          )}
-          {state?.data && <div>Created {state.data.Bucket}</div>}
         </CardContent>
-        <CardFooter>
-          <Field orientation="horizontal">
-            <Button type="submit" form="form-rhf-textarea" disabled={pending}>
-              Create
-            </Button>
-          </Field>
-        </CardFooter>
+
+        <div className="p-4 pt-0">
+          <Button
+            type="submit"
+            form="create-bucket"
+            disabled={pending}
+            className="w-full"
+          >
+            {pending ? (
+              <span className="flex items-center gap-2">
+                <Spinner data-icon="inline-start" />
+                Creating bucket…
+              </span>
+            ) : (
+              "Create bucket"
+            )}
+          </Button>
+        </div>
       </Card>
+
+      {state?.data && (
+        <>
+          <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-50">
+            <CheckCircleIcon className="h-4 w-4" />
+            <AlertTitle>Bucket created</AlertTitle>
+            <AlertDescription>
+              Bucket <strong>{state.data.Bucket}</strong> is ready to accept data.
+            </AlertDescription>
+          </Alert>
+
+          <FieldGroup className="space-y-4 rounded-md border p-4">
+            <Field>
+              <FieldLabel>Bucket name</FieldLabel>
+              <Input value={state.data.Bucket} readOnly />
+            </Field>
+
+            <Field>
+              <FieldLabel>Region</FieldLabel>
+              <Input value={state.data.Region} readOnly />
+            </Field>
+          </FieldGroup>
+        </>
+      )}
     </div>
   );
 }

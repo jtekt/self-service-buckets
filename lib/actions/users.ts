@@ -1,4 +1,5 @@
 "use server";
+
 import "dotenv/config";
 import {
   CreateAccessKeyCommand,
@@ -32,11 +33,11 @@ export async function getIamUser() {
     if (err instanceof Error && err.name !== "NoSuchEntityException") {
       console.error("Error retrieving user:", err);
     }
-    return undefined;
+    return;
   }
 }
 
-export async function createIamUser(prevState: any) {
+export async function createIamUser() {
   const session = await auth();
   if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;
@@ -81,7 +82,7 @@ export async function createIamUser(prevState: any) {
     return { error: null, data: { UserName: preferredUsername } };
   } catch (error: any) {
     console.error(error);
-    return { error: error.message, data: null };
+    return { error: error.message as string, data: null };
   }
 }
 
