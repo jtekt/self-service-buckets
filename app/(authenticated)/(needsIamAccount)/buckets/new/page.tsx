@@ -23,6 +23,12 @@ import { Input } from "@/components/ui/input";
 import { createBucket } from "@/lib/actions/buckets";
 import { useActionState, startTransition } from "react";
 import ReturnHome from "@/components/return-home";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 
 const formSchema = z.object({
   bucketName: z
@@ -72,25 +78,24 @@ export default function FormRhfTextarea() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-rhf-textarea-about">
-                      Bucket name
-                    </FieldLabel>
+                    <FieldLabel htmlFor="name">Bucket name</FieldLabel>
 
-                    <div className="flex items-center">
-                      <div className="whitespace-nowrap">
-                        self-service-buckets
-                      </div>
-                      <div>-</div>
-                      <div>{session?.user?.preferredUsername || "unknown"}</div>
-                      <div>-</div>
-                      <Input
+                    <InputGroup>
+                      <InputGroupAddon>
+                        <InputGroupText>
+                          self-service-buckets-
+                          {session?.user?.preferredUsername}-
+                        </InputGroupText>
+                      </InputGroupAddon>
+
+                      <InputGroupInput
+                        id="name"
                         {...field}
                         aria-invalid={fieldState.invalid}
                         placeholder="my-bucket"
                       />
-                    </div>
+                    </InputGroup>
 
-                    {/* <FieldDescription>Lowercase only</FieldDescription> */}
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
