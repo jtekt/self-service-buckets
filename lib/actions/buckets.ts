@@ -8,7 +8,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
 
-const { HTTPS_PROXY } = process.env;
+const { HTTPS_PROXY, NODE_ENV } = process.env;
 
 const s3Client = HTTPS_PROXY
   ? addProxyToClient(new S3Client({}))

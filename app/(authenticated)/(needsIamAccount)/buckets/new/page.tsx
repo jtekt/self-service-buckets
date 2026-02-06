@@ -32,6 +32,12 @@ import {
 } from "@/components/ui/alert";
 import ReturnTo from "@/components/return-to";
 import Link from "next/link";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 
 const formSchema = z.object({
   bucketName: z
@@ -131,20 +137,24 @@ export default function CreateBucketPage() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Bucket name</FieldLabel>
+                    <FieldLabel htmlFor="name">Bucket name</FieldLabel>
 
-                    <div className="flex items-center">
-                      <span className="whitespace-nowrap text-sm text-muted-foreground">
-                        self-service-buckets-
-                        {session?.user?.preferredUsername ?? "user"}-
-                      </span>
-                      <Input
+                    <InputGroup>
+                      <InputGroupAddon>
+                        <InputGroupText>
+                          self-service-buckets-
+                          {session?.user?.preferredUsername}-
+                        </InputGroupText>
+                      </InputGroupAddon>
+
+                      <InputGroupInput
+                        id="name"
                         {...field}
                         placeholder="my-bucket"
                         disabled={pending}
                         autoFocus
                       />
-                    </div>
+                    </InputGroup>
 
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

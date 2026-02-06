@@ -4,17 +4,25 @@ import { createKeys } from "@/lib/actions/users";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  AlertTriangleIcon,
-  DownloadIcon,
-  KeyIcon,
-} from "lucide-react";
-import { startTransition, useActionState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ReturnTo from "@/components/return-to";
+import {
+  AlertTriangleIcon,
+  KeyIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "lucide-react";
+import { startTransition, useActionState, useState } from "react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 export default function Page() {
+  const [secretVisible, setSecretVisibility] = useState(false);
   const [state, action, pending] = useActionState(createKeys, null);
 
   function onClick() {
@@ -73,7 +81,7 @@ export default function Page() {
         </AlertDescription>
       </Alert>
 
-      <FieldGroup className="space-y-4 rounded-md border p-4">
+      <FieldGroup className="grid max-w-sm grid-cols-1">
         <Field>
           <FieldLabel htmlFor="access-key-id">Access key ID</FieldLabel>
           <Input id="access-key-id" value={state.data.AccessKeyId} readOnly />
@@ -81,17 +89,31 @@ export default function Page() {
 
         <Field>
           <FieldLabel htmlFor="access-secret-key">Secret access key</FieldLabel>
-          <Input
-            id="access-secret-key"
-            value={state.data.SecretAccessKey}
-            readOnly
-          />
+          <InputGroup>
+            <InputGroupInput
+              id="access-secret-key"
+              value={state.data.SecretAccessKey}
+              readOnly
+              type={secretVisible ? "text" : "password"}
+            />
+
+            <InputGroupAddon align="inline-end">
+              <Button
+                onClick={() => setSecretVisibility(!secretVisible)}
+                variant="ghost"
+              >
+                {secretVisible ? <EyeIcon /> : <EyeOffIcon />}
+              </Button>
+            </InputGroupAddon>
+          </InputGroup>
         </Field>
       </FieldGroup>
-      <Button onClick={downloadAsJson}>
-        <DownloadIcon />
-        <span>Download keys</span>
-      </Button>
+      <div>
+        <Button onClick={downloadAsJson}>
+          <DownloadIcon />
+          <span>Download keys</span>
+        </Button>
+      </div>
     </div>
   );
 }
