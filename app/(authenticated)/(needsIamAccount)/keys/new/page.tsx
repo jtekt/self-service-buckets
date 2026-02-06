@@ -2,12 +2,18 @@
 import { createKeys } from "@/lib/actions/users";
 import ReturnHome from "@/components/return-home";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { DownloadIcon } from "lucide-react";
-import { startTransition, useActionState } from "react";
+import { DownloadIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { startTransition, useActionState, useState } from "react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 export default function Page() {
+  const [secretVisible, setSecretVisibility] = useState(false);
   const [state, action, pending] = useActionState(createKeys, null);
 
   function onClick() {
@@ -36,24 +42,43 @@ export default function Page() {
       </div>
 
       {state?.data && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 my-6">
           {/* TODO: download as file */}
           <div className="text-destructive">This will not be shown again</div>
-          <Field>
-            <FieldLabel htmlFor="access-key-id">Access key ID</FieldLabel>
-            <Input id="access-key-id" value={state.data.AccessKeyId} readOnly />
-          </Field>
 
-          <Field>
-            <FieldLabel htmlFor="access-secret-key">
-              Secret access key
-            </FieldLabel>
-            <Input
-              id="access-secret-key"
-              value={state.data.SecretAccessKey}
-              readOnly
-            />
-          </Field>
+          <FieldGroup className="grid max-w-sm grid-cols-1">
+            <Field>
+              <FieldLabel htmlFor="access-key-id">Access key ID</FieldLabel>
+              <Input
+                id="access-key-id"
+                value={state.data.AccessKeyId}
+                readOnly
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="access-secret-key">
+                Secret access key
+              </FieldLabel>
+              <InputGroup>
+                <InputGroupInput
+                  id="access-secret-key"
+                  value={state.data.SecretAccessKey}
+                  readOnly
+                  type={secretVisible ? "text" : "password"}
+                />
+
+                <InputGroupAddon align="inline-end">
+                  <Button
+                    onClick={() => setSecretVisibility(!secretVisible)}
+                    variant="ghost"
+                  >
+                    {secretVisible ? <EyeIcon /> : <EyeOffIcon />}
+                  </Button>
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+          </FieldGroup>
           <div>
             <Button onClick={downloadAsJson}>
               <DownloadIcon />
