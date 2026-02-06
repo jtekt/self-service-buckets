@@ -34,18 +34,22 @@ export async function createBucket(_: any, bucketName: string) {
   const Bucket = `${basePrefix}-${preferredUsername}-${bucketName}`;
 
   try {
+    const Region =
+      typeof s3Client.config.region === "string"
+        ? s3Client.config.region
+        : await s3Client.config.region();
+
+    if (NODE_ENV === "development")
+      return {
+        data: { Bucket, Region },
+      };
+
     await s3Client.send(
       new CreateBucketCommand({
         Bucket,
       }),
     );
-
-    const region =
-      typeof s3Client.config.region === "string"
-        ? s3Client.config.region
-        : await s3Client.config.region();
-
-    return { error: null, data: { Bucket, Region: region } };
+    return { error: null, data: { Bucket, Region } };
   } catch (error: any) {
     console.error(error);
     return { error: error.message, data: null };
