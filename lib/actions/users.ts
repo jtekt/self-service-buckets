@@ -22,7 +22,7 @@ const iamClient = HTTPS_PROXY
 
 export async function getIamUser() {
   const session = await auth();
-  if (!session?.user) return;
+  if (!session?.user) throw new Error("Unauthorized");
   const { preferredUsername: UserName } = session.user;
 
   try {
