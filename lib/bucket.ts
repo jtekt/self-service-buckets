@@ -4,9 +4,6 @@ import { basePrefix } from "./config";
 /**
  * Builds the standardized S3 bucket prefix for the current user.
  *
- * This prefix is used to namespace buckets per user and enforce
- * ownership and limits in a shared S3 account.
- *
  * Format:
  *   <basePrefix>-<preferredUsername>-
  *
@@ -22,11 +19,6 @@ export function getBucketPrefix(session: Session): string {
 
 /**
  * Builds the full S3 bucket name for a user-owned bucket.
- *
- * The resulting name:
- * - Is globally unique (when combined with basePrefix)
- * - Is scoped to the authenticated user
- * - Can be safely used for creation, lookup, and access control
  *
  * Format:
  *   <basePrefix>-<preferredUsername>-<bucketName>

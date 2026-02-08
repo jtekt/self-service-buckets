@@ -1,6 +1,5 @@
 "use server";
 
-import { addProxyToClient } from "aws-sdk-v3-proxy";
 import {
   CreateBucketCommand,
   DeleteBucketCommand,
@@ -8,6 +7,7 @@ import {
   ListObjectsV2Command,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { addProxyToClient } from "aws-sdk-v3-proxy";
 import { auth } from "@/auth";
 import { BUCKETS_LIMIT } from "@/lib/config";
 import { getBucketName, getBucketPrefix } from "../bucket";
