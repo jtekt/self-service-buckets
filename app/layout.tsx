@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { ModeToggle } from "@/components/toggle-mode";
 import Link from "next/link";
 import { Toaster } from "sonner";
+import { auth } from "@/auth";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -25,11 +26,12 @@ export const metadata: Metadata = {
   description: "Self-service S3 buckets",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
     <SessionProvider>
       <html lang="en" className={inter.variable} suppressHydrationWarning>
@@ -49,7 +51,7 @@ export default function RootLayout({
                 </Link>
 
                 <ModeToggle />
-                <LogoutButton />
+                {session && <LogoutButton />}
               </header>
 
               <main className="max-w-3xl mx-auto w-full p-4 grow flex flex-col">

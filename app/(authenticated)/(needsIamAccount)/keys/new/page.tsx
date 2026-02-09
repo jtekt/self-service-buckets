@@ -73,7 +73,7 @@ export default function Page() {
     <div className="space-y-4">
       <ReturnTo to="/keys" />
 
-      <Alert className="w-full border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-50">
+      <Alert variant="warning">
         <AlertTriangleIcon />
         <AlertTitle>This secret will not be shown again.</AlertTitle>
         <AlertDescription>

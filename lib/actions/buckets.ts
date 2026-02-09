@@ -3,9 +3,12 @@
 import {
   CreateBucketCommand,
   DeleteBucketCommand,
+  HeadBucketCommand,
   ListBucketsCommand,
   ListObjectsV2Command,
+  NoSuchBucket,
   S3Client,
+  S3ServiceException,
 } from "@aws-sdk/client-s3";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
 import { auth } from "@/auth";
@@ -18,13 +21,44 @@ const s3Client = HTTPS_PROXY
   ? addProxyToClient(new S3Client({}))
   : new S3Client({});
 
+export async function getUserBucketByName(bucketName: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const Prefix = getBucketPrefix(session);
+  if (!bucketName.startsWith(Prefix)) {
+    console.log("Try access bucket user is not owner: ", Prefix, bucketName);
+    return;
+  }
+
+  try {
+    const bucket = await s3Client.send(
+      new HeadBucketCommand({ Bucket: bucketName }),
+    );
+    return bucket;
+  } catch (error: unknown) {
+    if (error instanceof NoSuchBucket) return;
+
+    console.error("Unhandled error getting bucket by name:", error);
+  }
+}
+
 export async function getUserBuckets() {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
 
   const Prefix = getBucketPrefix(session);
 
-  return await s3Client.send(new ListBucketsCommand({ Prefix }));
+  try {
+    const { Buckets } = await s3Client.send(new ListBucketsCommand({ Prefix }));
+    return Buckets || [];
+  } catch (error: unknown) {
+    if (error instanceof S3ServiceException) {
+      return;
+    }
+    console.error("Unhandled error getting bucket by user:", error);
+    return;
+  }
 }
 
 export async function createBucket(_: any, bucketName: string) {
@@ -34,56 +68,41 @@ export async function createBucket(_: any, bucketName: string) {
   const Bucket = getBucketName(session, bucketName);
 
   try {
-    // Enforce bucket limit
     const userBuckets = await getUserBuckets();
-
-    if (BUCKETS_LIMIT && (userBuckets.Buckets ?? []).length >= BUCKETS_LIMIT) {
-      return {
-        error: `Bucket limit reached (${BUCKETS_LIMIT})`,
-        data: null,
-      };
+    if (BUCKETS_LIMIT && (userBuckets?.length ?? 0) >= BUCKETS_LIMIT) {
+      return { error: `Bucket limit reached (${BUCKETS_LIMIT})`, data: null };
     }
 
-    const Region =
-      typeof s3Client.config.region === "string"
-        ? s3Client.config.region
-        : await s3Client.config.region();
-
-    if (NODE_ENV === "development")
-      return {
-        data: { Bucket, Region },
-      };
-
-    await s3Client.send(
-      new CreateBucketCommand({
-        Bucket,
-      }),
-    );
-    return { error: null, data: { Bucket, Region } };
+    if (NODE_ENV !== "development") {
+      await s3Client.send(new CreateBucketCommand({ Bucket }));
+    }
+    return { error: null, data: { Bucket } };
   } catch (error: any) {
-    console.error(error);
-    return { error: error.message, data: null };
+    console.error(`Error creating bucket ${bucketName}:`, error);
+    if (error instanceof S3ServiceException) {
+      return { error: `Could not create: ${error.name}`, data: null };
+    }
+    return {
+      error: (error.message as string) || "An unexpected error occurred",
+      data: null,
+    };
   }
 }
 
 export async function deleteBucket(_: any, Bucket: string) {
   const session = await auth();
-  if (!session?.user) {
-    return { error: "Unauthorized", data: null };
-  }
+  if (!session?.user) return { error: "Unauthorized", data: null };
+
+  const Prefix = getBucketPrefix(session);
+  if (!Bucket.startsWith(Prefix)) return { error: "Unauthorized", data: null };
 
   try {
     const objects = await s3Client.send(
-      new ListObjectsV2Command({
-        Bucket,
-        MaxKeys: 1,
-      }),
+      new ListObjectsV2Command({ Bucket, MaxKeys: 1 }),
     );
-
     if (objects.KeyCount && objects.KeyCount > 0) {
       return {
-        error:
-          "Bucket is not empty. Delete all objects before deleting the bucket.",
+        error: "Bucket is not empty. Delete objects first.",
         data: null,
       };
     }
@@ -91,32 +110,22 @@ export async function deleteBucket(_: any, Bucket: string) {
     if (NODE_ENV !== "development") {
       await s3Client.send(new DeleteBucketCommand({ Bucket }));
     }
-
-    return {
-      error: null,
-      data: { Bucket },
-    };
+    return { error: null, data: { Bucket } };
   } catch (error: any) {
-    console.error(error);
-
     if (error.name === "BucketNotEmpty") {
       return {
-        error:
-          "Bucket is not empty. Delete all objects before deleting the bucket.",
+        error: "Bucket is not empty according to the storage service.",
         data: null,
       };
     }
-
-    if (error.name === "NoSuchBucket") {
-      return {
-        error: "Bucket does not exist.",
-        data: null,
-      };
+    console.error(`Error deleting bucket ${Bucket}:`, error);
+    if (error instanceof NoSuchBucket || error.name === "NoSuchBucket") {
+      return { error: "This bucket no longer exists.", data: null };
+    }
+    if (error instanceof S3ServiceException) {
+      return { error: `Delete failed: ${error.name}`, data: null };
     }
 
-    return {
-      error: "Failed to delete bucket.",
-      data: null,
-    };
+    return { error: "An internal error occurred during deletion", data: null };
   }
 }
