@@ -23,7 +23,7 @@ deploy-job:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   script:
-    - kubectl config use-context eks/gitlab-agent-for-kubernetes:eks
+    - kubectl config use-context eks-internal-public/gitlab-agent-for-kubernetes:eks-internal-public
     - kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
     - kubectl config set-context --current --namespace=$K8S_NAMESPACE
     # TODO: use ESO instead of CICD env

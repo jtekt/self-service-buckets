@@ -53,7 +53,7 @@ metadata:
   name: self-service-buckets
 spec:
   rules:
-    - host: self-service-buckets.jtektrnd.net
+    - host: self-service-buckets.public.jtektrnd.net
       http:
         paths:
           - path: /
