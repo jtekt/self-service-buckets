@@ -27,6 +27,8 @@ spec:
               value: https://keycloak.jtektrnd.net/realms/jtekt
             - name: NEXTAUTH_URL
               value: https://self-service-buckets.jtektrnd.net
+            - name: BUCKETS_LIMIT
+              value: 10
           envFrom:
             - secretRef:
                 name: self-service-buckets-env

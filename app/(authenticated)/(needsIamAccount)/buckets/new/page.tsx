@@ -12,11 +12,10 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { createBucket } from "@/lib/actions/buckets";
-import { useActionState, startTransition } from "react";
+import { useActionState, startTransition, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { CheckCircleIcon, DatabaseIcon } from "lucide-react";
+import { DatabaseIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ReturnTo from "@/components/return-to";
 import {
@@ -25,6 +24,8 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   bucketName: z
@@ -41,6 +42,8 @@ export default function CreateBucketPage() {
   const { data: session, status } = useSession();
   const [state, action, pending] = useActionState(createBucket, null);
 
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { bucketName: "" },
@@ -49,6 +52,13 @@ export default function CreateBucketPage() {
   function onSubmit({ bucketName }: z.infer<typeof formSchema>) {
     startTransition(() => action(bucketName));
   }
+
+  useEffect(() => {
+    if (state?.data) {
+      toast.success(`Bucket "${state.data.Bucket}" was created successfully.`);
+      router.push("/buckets/" + state.data.Bucket);
+    }
+  }, [state, router]);
 
   if (status === "loading") {
     return (
@@ -126,28 +136,11 @@ export default function CreateBucketPage() {
         </div>
       </Card>
 
-      {state?.data && (
-        <>
-          <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-50">
-            <CheckCircleIcon className="h-4 w-4" />
-            <AlertTitle>Bucket created</AlertTitle>
-            <AlertDescription>
-              Bucket <strong>{state.data.Bucket}</strong> is ready to accept data.
-            </AlertDescription>
-          </Alert>
-
-          <FieldGroup className="space-y-4 rounded-md border p-4">
-            <Field>
-              <FieldLabel>Bucket name</FieldLabel>
-              <Input value={state.data.Bucket} readOnly />
-            </Field>
-
-            <Field>
-              <FieldLabel>Region</FieldLabel>
-              <Input value={state.data.Region} readOnly />
-            </Field>
-          </FieldGroup>
-        </>
+      {!pending && state?.error && (
+        <Alert variant="destructive">
+          <AlertTitle>Unable to create bucket</AlertTitle>
+          <AlertDescription>{state.error}</AlertDescription>
+        </Alert>
       )}
     </div>
   );

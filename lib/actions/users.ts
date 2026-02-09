@@ -5,14 +5,20 @@ import {
   CreateAccessKeyCommand,
   CreateUserCommand,
   GetUserCommand,
-  ListAccessKeysCommand,
+  GetAccessKeyLastUsedCommand,
   PutUserPolicyCommand,
+  ListAccessKeysCommand,
+  NoSuchEntityException,
+  IAMServiceException,
+  EntityAlreadyExistsException,
+  DeleteAccessKeyCommand,
 } from "@aws-sdk/client-iam";
 import { auth } from "@/auth";
 import { basePrefix } from "@/lib/config";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
 
 import { IAMClient } from "@aws-sdk/client-iam";
+import { S3ServiceException } from "@aws-sdk/client-s3";
 
 const { HTTPS_PROXY, NODE_ENV } = process.env;
 
@@ -39,7 +45,7 @@ export async function getIamUser() {
 
 export async function createIamUser() {
   const session = await auth();
-  if (!session?.user) return { error: "Unauthorized", data: null };
+  if (!session?.user) throw new Error("Unauthorized");
   const { preferredUsername } = session.user;
 
   try {
@@ -81,8 +87,45 @@ export async function createIamUser() {
 
     return { error: null, data: { UserName: preferredUsername } };
   } catch (error: any) {
-    console.error(error);
-    return { error: error.message as string, data: null };
+    if (error instanceof EntityAlreadyExistsException) {
+      return { error: "User already exists", data: null };
+    }
+    console.error("IAM Create User Error:", error);
+    return {
+      error: (error.message as string) || "Could not create IAM user",
+      data: null,
+    };
+  }
+}
+
+export async function getUserKeyById(AccessKeyId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+  const { preferredUsername: UserName } = session.user;
+
+  try {
+    const { AccessKeyMetadata } = await iamClient.send(
+      new ListAccessKeysCommand({ UserName }),
+    );
+
+    const keyMeta = AccessKeyMetadata?.find(
+      (k) => k.AccessKeyId === AccessKeyId,
+    );
+
+    if (!keyMeta) {
+      return;
+    }
+
+    return keyMeta;
+  } catch (error: unknown) {
+    if (error instanceof NoSuchEntityException) return;
+
+    if (error instanceof IAMServiceException) {
+      console.error("IAM Service Error:", error);
+      return;
+    }
+
+    console.error("Unexpected Error getting user key:", error);
   }
 }
 
@@ -102,7 +145,10 @@ export async function getUserKeys() {
   }
 }
 
-export async function createKeys(prevState: any) {
+export async function createKeys(_: any) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
   if (NODE_ENV === "development")
     return {
       data: {
@@ -111,17 +157,7 @@ export async function createKeys(prevState: any) {
       },
     };
 
-  const session = await auth();
-  if (!session?.user) return { error: "Unauthorized", data: null };
   const { preferredUsername } = session.user;
-
-  // return {
-  //   error: null,
-  //   data: {
-  //     AccessKeyId: "dummy access key ID for testing",
-  //     SecretAccessKey: "dummy secret key for testing",
-  //   },
-  // };
 
   try {
     const { AccessKey } = await iamClient.send(
@@ -131,7 +167,62 @@ export async function createKeys(prevState: any) {
     );
     return { error: null, data: AccessKey };
   } catch (error: any) {
-    console.error(error);
-    return { error: error.message, data: null };
+    console.error("Create Keys Error:", error);
+    if (error instanceof S3ServiceException) {
+      if (error.name === "LimitExceededException") {
+        return {
+          error: "You have reached the maximum number of access keys.",
+          data: null,
+        };
+      }
+    }
+    return { error: error.message || "Failed to create keys", data: null };
+  }
+}
+
+export async function deleteUserAccessKey(_: any, AccessKeyId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  if (NODE_ENV === "development") {
+    return { error: null, data: true };
+  }
+
+  const { preferredUsername } = session.user;
+
+  try {
+    const { UserName } = await iamClient.send(
+      new GetAccessKeyLastUsedCommand({
+        AccessKeyId,
+      }),
+    );
+
+    if (UserName !== preferredUsername) {
+      return { error: "Unauthorized", data: null };
+    }
+
+    await iamClient.send(
+      new DeleteAccessKeyCommand({
+        UserName,
+        AccessKeyId,
+      }),
+    );
+
+    return { error: null, data: true };
+  } catch (error: unknown) {
+    console.error("Error deleting key:", error);
+    if (error instanceof NoSuchEntityException) {
+      return { error: "Access key not found.", data: null };
+    }
+
+    if (error instanceof IAMServiceException) {
+      console.error("IAM Delete Key Error:", error);
+      return {
+        error: `IAM Error: ${error.name}`,
+        data: null,
+      };
+    }
+
+    return { error: "Failed to delete access key.", data: null };
   }
 }
