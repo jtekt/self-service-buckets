@@ -26,7 +26,7 @@ spec:
             - name: AUTH_KEYCLOAK_ISSUER
               value: https://keycloak.jtektrnd.net/realms/jtekt
             - name: NEXTAUTH_URL
-              value: https://self-service-buckets.jtektrnd.net
+              value: https://self-service-buckets.public.jtektrnd.net
             - name: BUCKETS_LIMIT
               value: "10"
           envFrom:
