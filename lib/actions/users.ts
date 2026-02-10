@@ -168,14 +168,7 @@ export async function createKeys(_: any) {
     return { error: null, data: AccessKey };
   } catch (error: any) {
     console.error("Create Keys Error:", error);
-    if (error instanceof S3ServiceException) {
-      if (error.name === "LimitExceededException") {
-        return {
-          error: "You have reached the maximum number of access keys.",
-          data: null,
-        };
-      }
-    }
+    
     return { error: error.message || "Failed to create keys", data: null };
   }
 }
