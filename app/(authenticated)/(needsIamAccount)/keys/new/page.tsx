@@ -65,6 +65,13 @@ export default function Page() {
             "Generate access keys"
           )}
         </Button>
+
+        {!pending && state?.error && (
+          <Alert variant="destructive">
+            <AlertTitle>Unable to create key</AlertTitle>
+            <AlertDescription>{state.error}</AlertDescription>
+          </Alert>
+        )}
       </div>
     );
   }

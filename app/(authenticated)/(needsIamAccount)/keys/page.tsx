@@ -1,4 +1,5 @@
 import ReturnTo from "@/components/return-to";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,18 +26,37 @@ import Link from "next/link";
 export default async function Page() {
   const keys = await getUserKeys();
 
+  const isLimitReached = keys && keys.length >= 2;
+
   return (
     <div className="space-y-4">
       <ReturnTo to="/" />
 
+      {isLimitReached && (
+        <Alert variant="warning">
+          <AlertTitle>Key limit reached</AlertTitle>
+          <AlertDescription>
+            You have reached the maximum number of access keys (2). To create a
+            new key, delete an existing one first.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-3xl font-bold tracking-tight">My Keys</h2>
-        <Button asChild className="shadow-sm">
-          <Link href="/keys/new">
-            <PlusIcon className="mr-2 size-4" />
-            <span>Create key</span>
-          </Link>
-        </Button>
+        {isLimitReached ? (
+          <Button disabled>
+            <PlusIcon className="size-4" />
+            <span>Create Key</span>
+          </Button>
+        ) : (
+          <Button asChild>
+            <Link href="/keys/new">
+              <PlusIcon className="size-4" />
+              <span>Create Key</span>
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col gap-1">
