@@ -15,7 +15,14 @@ spec:
       containers:
         - name: self-service-buckets
           image: ${CONTAINER_IMAGE_TAGGED}
-          resources: {}
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 25m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+
           env:
             - name: AWS_REGION
               value: ap-northeast-1
