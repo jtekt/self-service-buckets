@@ -1,3 +1,0 @@
-MY_VAR="hello"
-
-echo BANANA$MY_VAR/APPLE

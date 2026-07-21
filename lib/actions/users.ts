@@ -64,14 +64,26 @@ export async function createIamUser() {
         // Bucket-level permissions
         {
           Effect: "Allow",
-          Action: ["s3:ListBucket"],
+          Action: [
+            "s3:ListBucket",
+            "s3:GetBucketLocation",
+            "s3:ListBucketMultipartUploads",
+          ],
           Resource: `arn:aws:s3:::${basePrefix}-${preferredUsername}-*`,
         },
 
         // Object-level permissions
         {
           Effect: "Allow",
-          Action: ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+          Action: [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject",
+            "s3:DeleteObjects",
+            "s3:GetObjectAttributes",
+            "s3:ListMultipartUploadParts",
+            "s3:AbortMultipartUpload",
+          ],
           Resource: `arn:aws:s3:::${basePrefix}-${preferredUsername}-*/*`,
         },
       ],
