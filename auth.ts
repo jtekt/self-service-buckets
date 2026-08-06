@@ -1,5 +1,5 @@
 import NextAuth, { type DefaultSession } from "next-auth";
-import Keycloak from "next-auth/providers/keycloak";
+import { type OIDCConfig } from "next-auth/providers";
 
 declare module "next-auth" {
   interface Session {
@@ -9,8 +9,14 @@ declare module "next-auth" {
   }
 }
 
+const OIDC = {
+  id: "oidc",
+  name: "OIDC",
+  type: "oidc",
+} satisfies OIDCConfig<Record<string, unknown>>;
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Keycloak],
+  providers: [OIDC],
   trustHost: true,
   callbacks: {
     async jwt({ token, account, profile }) {

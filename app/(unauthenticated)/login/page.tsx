@@ -8,9 +8,9 @@ export default function LoginPage() {
   return (
     <div className="max-w-sm w-full mx-auto flex flex-col items-center justify-center gap-6 flex-1">
       <h2 className="text-2xl">Login</h2>
-      <Button onClick={() => signIn("keycloak")}>
+      <Button onClick={() => signIn("oidc")}>
         <LogInIcon />
-        Continue with Keycloak
+        Continue with OIDC
       </Button>
     </div>
   );

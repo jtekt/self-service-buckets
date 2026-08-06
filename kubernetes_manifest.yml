@@ -26,11 +26,11 @@ spec:
           env:
             - name: AWS_REGION
               value: ap-northeast-1
-            - name: AUTH_KEYCLOAK_ID
+            - name: AUTH_OIDC_ID
               value: public
-            - name: AUTH_KEYCLOAK_SECRET
+            - name: AUTH_OIDC_SECRET
               value: 要らない
-            - name: AUTH_KEYCLOAK_ISSUER
+            - name: AUTH_OIDC_ISSUER
               value: https://keycloak.jtektrnd.net/realms/jtekt
             - name: NEXTAUTH_URL
               value: https://self-service-buckets.ssc.jtektrnd.net

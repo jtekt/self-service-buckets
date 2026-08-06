@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Next.js (App Router) app that lets authenticated users self-provision their own AWS S3 bucket(s) and IAM access keys, scoped so each user can only see/manage resources with their own prefix. Deployed to Kubernetes (EKS) via GitLab CI, behind Keycloak SSO.
+A Next.js (App Router) app that lets authenticated users self-provision their own AWS S3 bucket(s) and IAM access keys, scoped so each user can only see/manage resources with their own prefix. Deployed to Kubernetes (EKS) via GitLab CI, behind OIDC SSO.
 
 ## Commands
 
@@ -21,7 +21,7 @@ There is no test suite/framework configured in this repo (`test.bash` is an unre
 
 ### Authentication & authorization layering
 
-Auth is via **Auth.js v5 / next-auth beta** (`auth.ts`) using a single Keycloak provider. The Keycloak `preferred_username` claim is threaded through the JWT/session callbacks and exposed as `session.user.preferredUsername` — this is the identity used everywhere for scoping AWS resources (not email or sub).
+Auth is via **Auth.js v5 / next-auth beta** (`auth.ts`) using a single generic OIDC provider (id `"oidc"`, configured via `AUTH_OIDC_ID` / `AUTH_OIDC_SECRET` / `AUTH_OIDC_ISSUER`). The `preferred_username` claim from the OIDC profile is threaded through the JWT/session callbacks and exposed as `session.user.preferredUsername` — this is the identity used everywhere for scoping AWS resources (not email or sub). This assumes the configured IdP includes a `preferred_username` claim in its profile response.
 
 Route protection is layered through **nested route groups**, each with its own `layout.tsx` gate:
 
@@ -73,4 +73,4 @@ Follow this pattern for new mutating UI rather than ad hoc `fetch`/`onSubmit` ha
 ## Deployment
 
 - `Dockerfile` builds via Next's `output: "standalone"` (see `next.config.ts`) multi-stage image.
-- `.gitlab-ci.yml` builds/pushes to ECR and applies `kubernetes_manifest.yml` to an EKS namespace `self-service-suite` on pushes to `main`. Secrets are injected from a CI-managed env file into a Kubernetes secret (`self-service-buckets-env`) at deploy time — non-secret config (Keycloak issuer, region, `BUCKETS_LIMIT`) lives directly in `kubernetes_manifest.yml`.
+- `.gitlab-ci.yml` builds/pushes to ECR and applies `kubernetes_manifest.yml` to an EKS namespace `self-service-suite` on pushes to `main`. Secrets are injected from a CI-managed env file into a Kubernetes secret (`self-service-buckets-env`) at deploy time — non-secret config (OIDC issuer, region, `BUCKETS_LIMIT`) lives directly in `kubernetes_manifest.yml`.
