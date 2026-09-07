@@ -1,35 +1,17 @@
-import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import { HomeIcon } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-export default async function NotFound() {
-  const session = await auth();
+import { Button } from "@/components/ui/button";
 
-  if (!session) redirect("/login");
-
+export default function NotFound() {
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyTitle className="text-6xl">404</EmptyTitle>
-        <EmptyDescription>Page not found</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <Button asChild>
-          <Link href="/">
-            <HomeIcon />
-            Go to home
-          </Link>
-        </Button>
-      </EmptyContent>
-    </Empty>
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
+      <h2 className="text-2xl font-semibold">404 — Page not found</h2>
+      <p className="text-muted-foreground">
+        The page you&apos;re looking for doesn&apos;t exist.
+      </p>
+      <Link href="/">
+        <Button>Go to homepage</Button>
+      </Link>
+    </div>
   );
 }
