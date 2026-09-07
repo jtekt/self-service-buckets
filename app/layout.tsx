@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LogoutButton } from "@/components/logout-button";
 import { ModeToggle } from "@/components/toggle-mode";
+import { HelpLink } from "@/components/help-link";
 import Link from "next/link";
 import { Toaster } from "sonner";
 import { auth } from "@/auth";
@@ -22,7 +23,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Self-service Bucket",
+  title: "Self-Service Buckets",
   description: "Self-service S3 buckets",
 };
 
@@ -36,7 +37,7 @@ export default async function RootLayout({
     <SessionProvider>
       <html lang="en" className={inter.variable} suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
         >
           <ThemeProvider
             attribute="class"
@@ -44,24 +45,22 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex flex-col min-h-screen">
-              <header className="w-full border-b p-2 flex items-center gap-2">
-                <Link href="/" className="mr-auto text-2xl">
-                  Self-service Buckets
-                </Link>
+            <header className="flex h-12 items-center gap-2 border-b px-4">
+              <Link href="/" className="mr-auto text-base font-semibold">
+                Self-Service Buckets
+              </Link>
+              <ModeToggle />
+              <HelpLink />
+              {session && <LogoutButton />}
+            </header>
 
-                <ModeToggle />
-                {session && <LogoutButton />}
-              </header>
+            <main className="mx-auto w-full max-w-3xl flex-1 p-4">
+              {children}
+            </main>
 
-              <main className="max-w-3xl mx-auto w-full p-4 grow flex flex-col">
-                {children}
-              </main>
-
-              <footer className="border-t text-center text-sm p-3">
-                Self-service Buckets | JTEKT Corporation
-              </footer>
-            </div>
+            <footer className="border-t p-4 text-center text-sm">
+              Self-Service Buckets | JTEKT Corporation
+            </footer>
             <Toaster richColors />
           </ThemeProvider>
         </body>
