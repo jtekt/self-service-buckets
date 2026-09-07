@@ -1,5 +1,4 @@
 variables:
-  K8S_NAMESPACE: self-service-suite
   APPLICATION_NAME: self-service-buckets
   AWS_ECR_URL: 732469118990.dkr.ecr.ap-northeast-1.amazonaws.com
   CONTAINER_IMAGE_NAME: ${APPLICATION_NAME}
@@ -18,15 +17,3 @@ build-job:
     - docker push ${CONTAINER_IMAGE_TAGGED}
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-
-deploy-job:
-  stage: deploy
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  script:
-    - kubectl config use-context eks-internal-public/gitlab-agent-for-kubernetes:eks-internal-public
-    - kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-    - kubectl config set-context --current --namespace=$K8S_NAMESPACE
-    # TODO: use ESO instead of CICD env
-    - kubectl create secret generic self-service-buckets-env --from-env-file=$ENV --dry-run=client -o yaml | kubectl apply -f -
-    - envsubst < kubernetes_manifest.yml | kubectl apply -f -

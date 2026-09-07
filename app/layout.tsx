@@ -24,9 +24,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Self-service Bucket",
   description: "Self-service S3 buckets",
-  icons: {
-    icon: "/icon.png",
-  },
 };
 
 export default async function RootLayout({
