@@ -1,17 +1,28 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
 import { LogInIcon } from "lucide-react";
-import { signIn } from "next-auth/react";
+
+import { signIn } from "@/auth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
   return (
-    <div className="max-w-sm w-full mx-auto flex flex-col items-center justify-center gap-6 flex-1">
-      <h2 className="text-2xl">Login</h2>
-      <Button onClick={() => signIn("oidc")}>
-        <LogInIcon />
-        Continue with OIDC
-      </Button>
-    </div>
+    <Card className="mx-auto max-w-md">
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form
+          action={async () => {
+            "use server";
+            await signIn("oidc", { redirectTo: "/" });
+          }}
+        >
+          <Button type="submit" className="w-full">
+            <LogInIcon />
+            Continue with SSO
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
