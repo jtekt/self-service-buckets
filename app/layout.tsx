@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { LogoutButton } from "@/components/logout-button";
 import { ModeToggle } from "@/components/toggle-mode";
 import { HelpLink } from "@/components/help-link";
+import { AppIcon } from "@/components/app-icon";
 import Link from "next/link";
 import { Toaster } from "sonner";
 import { auth } from "@/auth";
@@ -46,7 +47,11 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <header className="flex h-12 items-center gap-2 border-b px-4">
-              <Link href="/" className="mr-auto text-base font-semibold">
+              <Link
+                href="/"
+                className="mr-auto flex items-center gap-2 text-base font-semibold"
+              >
+                <AppIcon className="size-5 shrink-0" />
                 Self-Service Buckets
               </Link>
               <ModeToggle />
