@@ -14,7 +14,7 @@ import {
   DeleteAccessKeyCommand,
 } from "@aws-sdk/client-iam";
 import { auth } from "@/auth";
-import { basePrefix } from "@/lib/config";
+import { basePrefix } from "@/config";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
 
 import { IAMClient } from "@aws-sdk/client-iam";

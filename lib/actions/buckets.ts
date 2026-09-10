@@ -12,7 +12,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { addProxyToClient } from "aws-sdk-v3-proxy";
 import { auth } from "@/auth";
-import { BUCKETS_LIMIT } from "@/lib/config";
+import { BUCKETS_LIMIT } from "@/config";
 import { getBucketName, getBucketPrefix } from "../bucket";
 
 const { HTTPS_PROXY, NODE_ENV } = process.env;

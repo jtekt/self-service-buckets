@@ -19,7 +19,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { BUCKETS_LIMIT } from "@/lib/config";
+import { BUCKETS_LIMIT } from "@/config";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default async function Page() {

@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import { basePrefix } from "./config";
+import { basePrefix } from "@/config";
 
 /**
  * Builds the standardized S3 bucket prefix for the current user.
