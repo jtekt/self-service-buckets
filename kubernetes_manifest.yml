@@ -77,3 +77,19 @@ spec:
                 name: self-service-buckets
                 port:
                   number: 3000
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: self-service-buckets
+spec:
+  refreshInterval: 5m0s
+  secretStoreRef:
+    name: aws-secrets-manager
+    kind: ClusterSecretStore
+  dataFrom:
+    - extract:
+        key: eks/ssc/eso/self-service-buckets
+  target:
+    name: self-service-buckets-env
+    creationPolicy: Orphan
