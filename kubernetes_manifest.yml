@@ -36,6 +36,8 @@ spec:
               value: https://self-service-buckets.ssc.jtektrnd.net
             - name: BUCKETS_LIMIT
               value: "10"
+            - name: NEXT_PUBLIC_APPS_URL
+              value: https://homepage.ssc.jtektrnd.net
           envFrom:
             - secretRef:
                 name: self-service-buckets-env

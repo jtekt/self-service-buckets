@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { LogoutButton } from "@/components/logout-button";
 import { ModeToggle } from "@/components/toggle-mode";
 import { HelpLink } from "@/components/help-link";
+import { AppsLink } from "@/components/apps-link";
 import { AppIcon } from "@/components/app-icon";
 import Link from "next/link";
 import { Toaster } from "sonner";
@@ -55,6 +56,7 @@ export default async function RootLayout({
                 Self-Service Buckets
               </Link>
               <ModeToggle />
+              <AppsLink />
               <HelpLink />
               {session && <LogoutButton />}
             </header>
