@@ -66,7 +66,7 @@ export default async function RootLayout({
             </main>
 
             <footer className="border-t p-4 text-center text-sm">
-              Self-Service Buckets | JTEKT Corporation
+              Self-Service Buckets | JTEKT Corporation | {process.env.NEXT_PUBLIC_APP_VERSION ?? "dev"}
             </footer>
             <Toaster richColors />
           </ThemeProvider>
