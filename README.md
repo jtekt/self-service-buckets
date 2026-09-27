@@ -43,6 +43,8 @@ The app runs at http://localhost:3000. In development (`NODE_ENV=development`), 
 | `HTTPS_PROXY` | If set, routes AWS SDK calls through this proxy |
 | `S3_ENDPOINT` | Display-only; shown to users as the endpoint to use with their access keys (defaults to `https://s3.amazonaws.com`) |
 | `BUCKETS_LIMIT` | Optional max number of buckets per user (unset = unlimited) |
+| `NEXT_PUBLIC_HELP_URL` | Optional help link shown in the header |
+| `NEXT_PUBLIC_APPS_URL` | Optional link to the apps portal shown in the header |
 
 ## Building & running
 
@@ -59,7 +61,7 @@ npm run lint
 
 ## Deployment
 
-Built as a standalone Next.js Docker image (see `Dockerfile`) and deployed to Kubernetes via GitLab CI (`.gitlab-ci.yml`, `kubernetes_manifest.yml`) on pushes to `main`.
+A release is a `vX.Y.Z` tag on `main`. GitLab CI (`.gitlab-ci.yml`) builds the standalone Next.js Docker image (see `Dockerfile`), pushes it to public ECR as [`public.ecr.aws/jtekt-corporation/self-service-buckets`](https://gallery.ecr.aws/jtekt-corporation/self-service-buckets) (`:<tag>` and `:latest`), and applies `kubernetes_manifest.yml` to the cluster. Pushing `main` without a tag deploys nothing.
 
 ## Development references
 
