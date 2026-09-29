@@ -39,7 +39,9 @@ export default function DeleteBucket({ name }: { name: string }) {
       <DialogTrigger asChild>
         <Button
           variant="destructive"
+          size="icon"
           aria-label="Delete bucket"
+          title="Delete bucket"
         >
           <Trash2Icon />
         </Button>

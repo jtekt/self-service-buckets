@@ -48,7 +48,9 @@ export default function DeleteKey({
       <DialogTrigger asChild>
         <Button
           variant="destructive"
+          size="icon"
           aria-label="Delete access key"
+          title="Delete access key"
         >
           <Trash2Icon />
         </Button>
