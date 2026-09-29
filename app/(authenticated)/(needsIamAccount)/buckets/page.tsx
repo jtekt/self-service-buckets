@@ -44,15 +44,13 @@ export default async function Page() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-3xl font-bold tracking-tight">My Buckets</h2>
         {isLimitReached ? (
-          <Button disabled>
+          <Button size="icon" disabled aria-label="Create Bucket" title="Create Bucket">
             <PlusIcon className="size-4" />
-            <span>Create Bucket</span>
           </Button>
         ) : (
-          <Button asChild>
-            <Link href="/buckets/new">
+          <Button asChild size="icon">
+            <Link href="/buckets/new" aria-label="Create Bucket" title="Create Bucket">
               <PlusIcon className="size-4" />
-              <span>Create Bucket</span>
             </Link>
           </Button>
         )}

@@ -45,15 +45,13 @@ export default async function Page() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-3xl font-bold tracking-tight">My Keys</h2>
         {isLimitReached ? (
-          <Button disabled>
+          <Button size="icon" disabled aria-label="Create Key" title="Create Key">
             <PlusIcon className="size-4" />
-            <span>Create Key</span>
           </Button>
         ) : (
-          <Button asChild>
-            <Link href="/keys/new">
+          <Button asChild size="icon">
+            <Link href="/keys/new" aria-label="Create Key" title="Create Key">
               <PlusIcon className="size-4" />
-              <span>Create Key</span>
             </Link>
           </Button>
         )}
